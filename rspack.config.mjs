@@ -18,16 +18,27 @@ const config = {
   entry: {
     main: "./src/index",
   },
-  plugins: [new HtmlWebpackPlugin()],
+  plugins: [(compiler) => {
+    compiler.hooks.compilation.tap('test', (compilation) => {
+      // Comment this out to make `__rspack_unique_id__` work
+      compilation.hooks.additionalTreeRuntimeRequirements.tap('test', (_, set) => { })
+    })
+  }],
+  experiments: {
+    ...(isRunningRspack ? {
+      rspackFuture: {
+        bundlerInfo: {
+          force: true
+        }
+      }
+    } : {})
+  },
   output: {
     clean: true,
     path: isRunningWebpack
       ? path.resolve(__dirname, "webpack-dist")
       : path.resolve(__dirname, "rspack-dist"),
     filename: "[name].js",
-  },
-  experiments: {
-    css: true,
   },
 };
 
